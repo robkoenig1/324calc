@@ -1,0 +1,146 @@
+$date
+  Tue Apr  1 19:47:59 2025
+$end
+$version
+  GHDL v0
+$end
+$timescale
+  1 fs
+$end
+$scope module standard $end
+$upscope $end
+$scope module std_logic_1164 $end
+$upscope $end
+$scope module addsub_tb $end
+$var reg 4 ! a_in[3:0] $end
+$var reg 4 " b_in[3:0] $end
+$var reg 1 # sub_mode $end
+$var reg 4 $ res[3:0] $end
+$var reg 1 % ovf $end
+$scope module addsub_inst $end
+$var reg 4 & a[3:0] $end
+$var reg 4 ' b[3:0] $end
+$var reg 1 ( sub $end
+$var reg 4 ) result[3:0] $end
+$var reg 1 * overflow $end
+$var reg 4 + b_complement[3:0] $end
+$var reg 4 , carry[3:0] $end
+$var reg 4 - sum[3:0] $end
+$upscope $end
+$upscope $end
+$enddefinitions $end
+#0
+b0011 !
+b0010 "
+0#
+b0101 $
+0%
+b0011 &
+b0010 '
+0(
+b0101 )
+0*
+b0010 +
+b0100 ,
+b0101 -
+#10000000
+b0101 !
+b1110 "
+b0011 $
+b0101 &
+b1110 '
+b0011 )
+b1110 +
+b1000 ,
+b0011 -
+#20000000
+b1110 !
+b1101 "
+b1011 $
+0%
+b1110 &
+b1101 '
+b1011 )
+0*
+b1101 +
+b1000 ,
+b1011 -
+#30000000
+b0111 !
+b0001 "
+b1000 $
+1%
+b0111 &
+b0001 '
+b1000 )
+1*
+b0001 +
+b1110 ,
+b1000 -
+#40000000
+b1000 !
+b1000 "
+b0000 $
+1%
+b1000 &
+b1000 '
+b0000 )
+1*
+b1000 +
+b0000 ,
+b0000 -
+#50000000
+b0110 !
+b0011 "
+1#
+b0011 $
+0%
+b0110 &
+b0011 '
+1(
+b0011 )
+0*
+b1101 +
+b1000 ,
+b0011 -
+#60000000
+b0010 !
+b1111 $
+b0010 &
+b1111 )
+b0000 ,
+b1111 -
+#70000000
+b0011 !
+b1110 "
+b0101 $
+0%
+b0011 &
+b1110 '
+b0101 )
+0*
+b0010 +
+b0100 ,
+b0101 -
+#80000000
+b0111 !
+b1000 "
+b1111 $
+b0111 &
+b1000 '
+b1111 )
+b1000 +
+b0000 ,
+b1111 -
+#90000000
+b1000 !
+b0001 "
+b0111 $
+1%
+b1000 &
+b0001 '
+b0111 )
+1*
+b1111 +
+b0111 -
+#100000000
