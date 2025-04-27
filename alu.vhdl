@@ -1,4 +1,3 @@
-
 library ieee;
 use ieee.std_logic_1164.all;
 
@@ -31,19 +30,18 @@ begin
     compare_proc: process(A_lower, B_lower)
         variable temp : std_logic;
     begin
-        temp := '1';  --assume equal
+        temp := '1'; --assume equal
         for i in 0 to 7 loop
             if A_lower(i) /= B_lower(i) then
-                temp := '0';  --not equal
+                temp := '0'; --not equal
             end if;
         end loop;
         compare_result <= temp;
     end process;
     
-    --add operation using ripple carry adder
-    carry(0) <= '0';  --no initial carry
+    carry(0) <= '0'; --no initial carry
     
-    add_gen: for i in 0 to 15 generate
+    add_gen: for i in 0 to 15 generate --add operation using ripple carry adder
         add_result(i) <= A(i) xor B(i) xor carry(i);
         carry_gen: if i < 15 generate
             carry(i+1) <= (A(i) and B(i)) or (A(i) and carry(i)) or (B(i) and carry(i));
@@ -53,19 +51,19 @@ begin
     process(op, A, B, swapped_A, add_result, compare_result)
     begin
         case op is
-            when "00" =>  --compare
-                result <= (others => '0');  --not used for compare
+            when "00" => --compare
+                result <= (others => '0'); --not used for compare
                 equal <= compare_result;
                 
-            when "01" =>  --swap
+            when "01" => --swap
                 result <= swapped_A;
                 equal <= '0';
                 
-            when "10" =>  --load
+            when "10" => --load
                 result <= A;
                 equal <= '0';
                 
-            when "11" =>  --add
+            when "11" => --add
                 result <= add_result;
                 equal <= '0';
                 

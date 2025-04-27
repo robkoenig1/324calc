@@ -8,8 +8,8 @@ generic (
   );
 port(	
 	I:	in std_logic_vector (WIDTH-1 downto 0); -- for loading
- 	clock:		in std_logic; -- rising-edge triggering 
-	enable:		in std_logic; -- 0: don't do anything; 1: reg is enabled
+ 	clk:		in std_logic; -- rising-edge triggering 
+	en:		in std_logic; -- 0: don't do anything; 1: reg is enabled
 	O:	out std_logic_vector(WIDTH-1 downto 0) -- output the current register content. 
 );
 end reg;
@@ -18,11 +18,11 @@ architecture behavioral of reg is
     signal reg_content: std_logic_vector(WIDTH-1 downto 0) := (others => '0'); -- initialize register content to zeros
 begin
 
-    process(clock)
+    process(clk)
     begin
 
-	if rising_edge(clock) then -- rising-edge triggering
-	    if enable = '1' then -- check if register is enabled
+	if rising_edge(clk) then -- rising-edge triggering
+	    if en = '1' then -- check if register is enabled
               reg_content <= I; -- load input into register
             end if;
         end if;
