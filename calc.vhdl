@@ -9,6 +9,7 @@ port(
     clk:          in std_logic;
     reset:        in std_logic;
     instruction:  in std_logic_vector(7 downto 0);
+    pc_out:       out std_logic_vector(3 downto 0);
     printout:     out std_logic_vector(15 downto 0)
 );
 end calc;
@@ -25,6 +26,15 @@ architecture rtl of calc is
         reset: in std_logic;
         en:  in std_logic;
         O:   out std_logic_vector(WIDTH-1 downto 0)
+    );
+    end component;
+
+    component counter
+    port(
+        clk:  in std_logic;
+        reset:  in std_logic;
+        skip: in std_logic;
+        count:  out std_logic_vector(3 downto 0)
     );
     end component;
 
@@ -51,6 +61,15 @@ architecture rtl of calc is
     signal equ : std_logic;
     signal print_en : std_logic;
     signal ext_en : std_logic;
+
+    -- Program counter signals
+    signal pc_reset: std_logic;
+    signal pc_skip: std_logic;
+    signal pc_value: std_logic_vector(3 downto 0);
+    signal skip_next: std_logic;
+    signal pc_enable: std_logic;
+    signal current_state : std_logic_vector(1 downto 0);
+    signal next_state : std_logic_vector(1 downto 0);
 
     -- reg file and signals
     signal reg0_in : std_logic_vector(15 downto 0);
@@ -81,7 +100,68 @@ architecture rtl of calc is
     signal alu_equal : std_logic;
 
 
-begin    
+begin
+    
+    -- Counter instance for Program Counter
+    pc_counter: counter
+    port map (
+        clk => clk,
+        reset => pc_reset,
+        skip => pc_skip,
+        count => pc_value
+    );
+    
+    -- Connect PC to output port
+    pc_out <= pc_value;
+    
+    -- PC control signals
+    pc_reset <= reset;  -- Connect to main reset
+    pc_skip <= '1';
+
+    --fetch = 00
+    --exe = 01
+    --skip = 10
+    -- FSM for instruction fetch and execution
+    process(clk, reset)
+    begin
+        if reset = '1' then
+            current_state <= "00";
+            skip_next <= '0';
+        elsif rising_edge(clk) then
+            current_state <= next_state;
+            
+            -- Check if we need to skip next instruction based on comparison
+            if current_state = "01" and opcode = "11" and alu_equal = '1' then
+                skip_next <= '1';
+            elsif current_state = "10" then
+                skip_next <= '0';
+            end if;
+        end if;
+    end process;
+    
+    -- FSM next state logic
+    process(current_state, skip_next)
+    begin
+        case current_state is
+            when "00" =>
+                next_state <= "01";
+                
+            when "01" =>
+                if skip_next = '1' then
+                    next_state <= "10";
+                    pc_skip <= '1';
+                else
+                    next_state <= "00";
+                    pc_skip <= '0';
+                end if;
+                
+            when "10" =>
+                next_state <= "00";
+                
+            when others =>
+                next_state <= "00";
+        end case;
+    end process;
 
     -- instruction
     opcode <= instruction(7 downto 6);
@@ -101,7 +181,7 @@ begin
         --    debug_int := 0;
         --end if;
         --report "help " & integer'image(debug_int);
-        --help := to_integer(signed(alu_result));
+        --help := to_integer(unsigned(pc_value));
         --report "help " & integer'image(help);
         -- default
         --reg_wr <= '0';
@@ -118,7 +198,7 @@ begin
                 reg_dst <= '0';
                 alu_op <= "11";
                 alu_src <= '0';
-                equ <= '0';
+                equ <= alu_equal;
                 print_en <= '0';
                 ext_en <= '0';
             when "01" => -- sawp
@@ -126,7 +206,7 @@ begin
                 reg_dst <= '1';
                 alu_op <= "01";
                 alu_src <= '0';
-                equ <= '0';
+                equ <= alu_equal;
                 print_en <= '0';
                 ext_en <= '0';
             when "10" => -- load
@@ -134,7 +214,7 @@ begin
                 reg_dst <= '1'; --0
                 alu_op <= "10";
                 alu_src <= '1';
-                equ <= '0';
+                equ <= alu_equal;
                 print_en <= '0';
                 ext_en <= '1';
             when "11" => -- cmp and display
@@ -143,7 +223,7 @@ begin
                     reg_dst <= '0';
                     alu_op <= "00";
                     alu_src <= '0';
-                    equ <= '0';
+                    equ <= alu_equal;
                     print_en <= '1';
                     ext_en <= '0';
                 else -- cmp
@@ -330,11 +410,13 @@ begin
     process(clk)
     begin
         if rising_edge(clk) then
-            if reset = '1' then
-                printout <= (others => '0');
-            elsif print_en = '1' then
+            --if reset = '1' then
+            --    printout <= (others => '0');
+            if print_en = '1' then
                 -- For display operation, show the register value directly
                 printout <= rf_rd_data1;
+            elsif alu_op = "00" then
+                printout <= (0 => alu_equal, others => '0');
             else
                 -- For normal operations, show ALU result
                 printout <= alu_result;

@@ -27,17 +27,18 @@ begin
 
     swapped_A <= A(7 downto 0) & A(15 downto 8);
     
-    compare_proc: process(A_lower, B_lower)
-        variable temp : std_logic;
-    begin
-        temp := '1'; --assume equal
-        for i in 0 to 7 loop
-            if A_lower(i) /= B_lower(i) then
-                temp := '0'; --not equal
-            end if;
-        end loop;
-        compare_result <= temp;
-    end process;
+    --compare_proc: process(A_lower, B_lower)
+    --    variable temp : std_logic;
+    --begin
+    --    temp := '1'; --assume equal
+    --    for i in 0 to 7 loop
+     --       if A_lower(i) /= B_lower(i) then
+     --           temp := '0'; --not equal
+     --       end if;
+    --    end loop;
+    --    compare_result <= temp;
+    --end process;
+    compare_result <= '1' when (A_lower = B_lower) else '0';
     
     carry(0) <= '0'; --no initial carry
     

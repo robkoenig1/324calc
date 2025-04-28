@@ -15,6 +15,7 @@ architecture tb of calc_tb is
         clk:          in std_logic;
         reset:        in std_logic;
         instruction:  in std_logic_vector(7 downto 0);
+        pc_out:       out std_logic_vector(3 downto 0);
         printout:     out std_logic_vector(15 downto 0)
     );
     end component;
@@ -26,7 +27,7 @@ architecture tb of calc_tb is
     signal printout_tb : std_logic_vector(15 downto 0);
     
     -- Clock period definition
-    constant clk_period : time := 100 ns;
+    constant clk_period : time := 10 ns;
     
     -- Instruction format helpers
     -- opcode: 2 bits (bits 7-6)
@@ -53,13 +54,13 @@ architecture tb of calc_tb is
     -- Function to create an instruction
     function make_instruction(
         opcode: std_logic_vector(1 downto 0);
-        rd: std_logic_vector(1 downto 0);
+        rs: std_logic_vector(1 downto 0);
         rt_or_imm: std_logic_vector(3 downto 0)
     ) return std_logic_vector is
         variable instruction: std_logic_vector(7 downto 0);
     begin
         instruction(7 downto 6) := opcode;
-        instruction(5 downto 4) := rd;
+        instruction(5 downto 4) := rs;
         instruction(3 downto 0) := rt_or_imm;
         return instruction;
     end function;
@@ -105,8 +106,10 @@ begin
         
         procedure check_output(expected: integer) is
             variable printout_int: integer;
+            --variable hate : string;
         begin
             printout_int := to_integer(signed(printout_tb));
+
             if printout_int = expected then
                 report "PASS: Output matches expected value " & integer'image(expected);
             else
@@ -132,30 +135,27 @@ begin
         report "Test 1: Loading immediate values into registers";
         
         -- Load R0 with immediate value 5
-        instruction_tb <= make_instruction(OP_LOAD, R0, "0101");  -- Load 5 into R0
+        instruction_tb <= make_instruction(OP_LOAD, "00", "0101");  -- Load 5 into R0
         wait_cycles(5);
-        
-        -- Display R0
-        display_register(instruction_tb, R0);
-        wait_cycles(5);
-        -- Check output
         check_output(5);
-        
+        wait_cycles(5);
+
         -- Load R1 with immediate value -3 (signed 4-bit value)
-        instruction_tb <= make_instruction(OP_LOAD, R1, "1101");  -- Load -3 into R1
+        instruction_tb <= make_instruction(OP_LOAD, "01", "1101");  -- Load -3 into R1
         wait_cycles(5);
 
         -- Display R1
-        display_register(instruction_tb, R1);
-        wait_cycles(5);
+        --display_register(instruction_tb, "01");
+        --wait_cycles(10);
         -- Check output
         check_output(-3);
+        wait_cycles(5);
         
         -- Test 2: Addition
         report "Test 2: Testing addition";
         
         -- Add R0 and R1, store in R0 (5 + (-3) = 2)
-        instruction_tb <= make_instruction(OP_ADD, R0, R1 & "00");
+        instruction_tb <= make_instruction(OP_ADD, R0, R1 & R0);
         wait_cycles(1);
         
         -- Display R0
@@ -166,15 +166,15 @@ begin
         
         -- Test 3: Swap operation
         report "Test 3: Testing swap operation";
-        
+
         -- Load R2 with value 0x0004 (low byte=0x04)
         instruction_tb <= make_instruction(OP_LOAD, R2, "0100");  -- Load 4 (lower byte)
-        wait_cycles(1);
+        wait_cycles(5);
         
         -- Load R3 with value 0x0008 (lower byte=0x08)
-        instruction_tb <= make_instruction(OP_LOAD, R3, "1000");  -- Load 8 (lower byte)
-        wait_cycles(1);
-        
+        instruction_tb <= make_instruction(OP_LOAD, R3, "1000");  -- Load -8 (lower byte)
+        wait_cycles(5);
+
         -- Now perform swap on R2 (assuming swap exchanges lower and upper bytes)
         instruction_tb <= make_instruction(OP_SWAP, R0, R2 & "00");  -- Swap bytes in R2, store in R0
         wait_cycles(1);
@@ -182,6 +182,7 @@ begin
         -- Display R0
         display_register(instruction_tb, R0);
         wait_cycles(1);
+        check_output(512);
         -- Value would depend on how swap is implemented - can't check exact value without knowing implementation
         
         -- Test 4: Compare operation
@@ -189,35 +190,48 @@ begin
         
         -- Reset R0 to 5
         instruction_tb <= make_instruction(OP_LOAD, R0, "0101");  -- Load 5 into R0
-        wait_cycles(1);
+        wait_cycles(5);
         
         -- Reset R1 to 5 (same as R0)
         instruction_tb <= make_instruction(OP_LOAD, R1, "0101");  -- Load 5 into R1
-        wait_cycles(1);
+        wait_cycles(5);
         
         -- Compare R0 and R1 (they should be equal)
         instruction_tb <= make_instruction(OP_CMP, R0, R1 & "00");  -- Compare R0 and R1
-        wait_cycles(1);
+        wait_cycles(10);
         
+        check_output(1);
+        wait_cycles(5);
+
+        -- Reset R1 to 5 (same as R0)
+        instruction_tb <= make_instruction(OP_LOAD, R1, "0110");  -- Load 6 into R1
+        wait_cycles(5);
+
+        -- Compare R0 and R1 (they should be equal)
+        instruction_tb <= make_instruction(OP_CMP, R0, R1 & "00");  -- Compare R0 and R1
+        wait_cycles(5);
+
+        check_output(0);
+        wait_cycles(5);
         -- The comparison result would typically set a flag, which we can't test directly in this testbench
         -- But we can load different values and try again
         
         -- Set R1 to a different value
-        instruction_tb <= make_instruction(OP_LOAD, R1, "0110");  -- Load 6 into R1
-        wait_cycles(1);
+        --instruction_tb <= make_instruction(OP_LOAD, R1, "0110");  -- Load 6 into R1
+        --wait_cycles(1);
         
         -- Compare R0 and R1 (they should not be equal)
-        instruction_tb <= make_instruction(OP_CMP, R0, R1 & "00");  -- Compare R0 and R1
-        wait_cycles(1);
+        --instruction_tb <= make_instruction(OP_CMP, R0, R1 & "00");  -- Compare R0 and R1
+        --wait_cycles(1);
         
         -- Display R0 and R1 to confirm values
-        display_register(instruction_tb, R0);
-        wait_cycles(1);
-        check_output(5);
+        --display_register(instruction_tb, R0);
+        --wait_cycles(1);
+        --check_output(5);
         
-        display_register(instruction_tb, R1);
-        wait_cycles(1);
-        check_output(6);
+        --display_register(instruction_tb, R1);
+        --wait_cycles(1);
+        --check_output(6);
         
         -- Test 5: Complex sequence
         report "Test 5: Complex sequence";
@@ -230,11 +244,11 @@ begin
         wait_cycles(1);
         
         -- Add R0 and R1, store in R2
-        instruction_tb <= make_instruction(OP_ADD, R2, R0 & "00");
+        instruction_tb <= make_instruction(OP_ADD, R2, R0 & R1);
         wait_cycles(1);
         
-        instruction_tb <= make_instruction(OP_ADD, R2, R1 & "00");
-        wait_cycles(1);
+        --instruction_tb <= make_instruction(OP_ADD, R2, R1 & "00");
+        --wait_cycles(1);
         
         -- Display R2
         display_register(instruction_tb, R2);
