@@ -4,11 +4,12 @@ use IEEE.numeric_std.all;
 
 entity reg is
 generic (
-    WIDTH : natural := 8  -- Default width is 8 bits, can be overridden at instantiation.
+    WIDTH : natural := 16  -- Default width is 8 bits, can be overridden at instantiation.
   );
 port(	
 	I:	in std_logic_vector (WIDTH-1 downto 0); -- for loading
  	clk:		in std_logic; -- rising-edge triggering 
+    reset: in std_logic;
 	en:		in std_logic; -- 0: don't do anything; 1: reg is enabled
 	O:	out std_logic_vector(WIDTH-1 downto 0) -- output the current register content. 
 );
@@ -22,10 +23,13 @@ begin
     begin
 
 	if rising_edge(clk) then -- rising-edge triggering
-	    if en = '1' then -- check if register is enabled
-              reg_content <= I; -- load input into register
-            end if;
+        if reset = '1' then
+            reg_content <= (others => '0');
+	    elsif en = '1' then -- check if register is enabled
+            reg_content <= I; -- load input into register
         end if;
+    end if;
+
     end process;
 
     O <= reg_content; -- output the current register content

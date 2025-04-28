@@ -26,7 +26,7 @@ architecture tb of calc_tb is
     signal printout_tb : std_logic_vector(15 downto 0);
     
     -- Clock period definition
-    constant clk_period : time := 10 ns;
+    constant clk_period : time := 100 ns;
     
     -- Instruction format helpers
     -- opcode: 2 bits (bits 7-6)
@@ -53,13 +53,13 @@ architecture tb of calc_tb is
     -- Function to create an instruction
     function make_instruction(
         opcode: std_logic_vector(1 downto 0);
-        rs: std_logic_vector(1 downto 0);
+        rd: std_logic_vector(1 downto 0);
         rt_or_imm: std_logic_vector(3 downto 0)
     ) return std_logic_vector is
         variable instruction: std_logic_vector(7 downto 0);
     begin
         instruction(7 downto 6) := opcode;
-        instruction(5 downto 4) := rs;
+        instruction(5 downto 4) := rd;
         instruction(3 downto 0) := rt_or_imm;
         return instruction;
     end function;
@@ -124,7 +124,7 @@ begin
         -- Release reset
         reset_tb <= '0';
         wait_cycles(2);
-        
+
         -- Use report statements instead of writeline for console output
         report "Starting Calculator Test";
         
@@ -133,21 +133,21 @@ begin
         
         -- Load R0 with immediate value 5
         instruction_tb <= make_instruction(OP_LOAD, R0, "0101");  -- Load 5 into R0
-        wait_cycles(1);
-        
-        -- Load R1 with immediate value -3 (signed 4-bit value)
-        instruction_tb <= make_instruction(OP_LOAD, R1, "1101");  -- Load -3 into R1
-        wait_cycles(1);
+        wait_cycles(5);
         
         -- Display R0
         display_register(instruction_tb, R0);
-        wait_cycles(1);
+        wait_cycles(5);
         -- Check output
         check_output(5);
         
+        -- Load R1 with immediate value -3 (signed 4-bit value)
+        instruction_tb <= make_instruction(OP_LOAD, R1, "1101");  -- Load -3 into R1
+        wait_cycles(5);
+
         -- Display R1
         display_register(instruction_tb, R1);
-        wait_cycles(1);
+        wait_cycles(5);
         -- Check output
         check_output(-3);
         

@@ -60,7 +60,7 @@ begin
                 equal <= '0';
                 
             when "10" => --load
-                result <= A;
+                result <= B;
                 equal <= '0';
                 
             when "11" => --add
