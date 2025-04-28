@@ -1,7 +1,7 @@
 v 4
-file . "calc.vhdl" "31fbefb338c376a1913e52dc52e0b465c7287893" "20250428191556.735":
-  entity calc at 1( 0) + 0 on 431;
-  architecture rtl of calc at 17( 357) + 0 on 432;
+file . "calc.vhdl" "27af18c284132aae718cb4e56a806a03991a489e" "20250428203333.040":
+  entity calc at 1( 0) + 0 on 513;
+  architecture rtl of calc at 15( 324) + 0 on 514;
 file . "addsub.vhdl" "7cdb9933d159dbdf8af58e535d7475418d648b0c" "20250401234733.373":
   entity addsub at 1( 0) + 0 on 61;
   architecture rtl of addsub at 14( 459) + 0 on 62;
@@ -17,18 +17,18 @@ file . "reg_tb.vhdl" "efd65211bf0727145c72b8df1b25f4ce912cf326" "20250401233805.
 file . "reg.vhdl" "41ce1bbd03b99387760c86d9ad13170b1a7ca009" "20250428133238.427":
   entity reg at 1( 0) + 0 on 129;
   architecture behavioral of reg at 18( 490) + 0 on 130;
-file . "counter.vhdl" "1ff558ab850abec18169a633a1b4d9655eea4409" "20250428191646.795":
-  entity counter at 1( 0) + 0 on 433;
-  architecture structural of counter at 13( 338) + 0 on 434;
+file . "counter.vhdl" "c03cafd357a2f2efb2fb2783a1adbf6f295d689c" "20250428193136.721":
+  entity counter at 1( 0) + 0 on 439;
+  architecture structural of counter at 13( 322) + 0 on 440;
 file . "reg8_tb.vhdl" "d542908efb13d6b0a092f21d3bc5f0a60bd9e1a1" "20250401234454.219":
   entity reg8_tb at 1( 0) + 0 on 59;
   architecture behavioral of reg8_tb at 8( 109) + 0 on 60;
 file . "addsub_tb.vhdl" "f24cfab5d1ecb841c02fb6f6ea808f39d8e265e6" "20250401234736.602":
   entity addsub_tb at 1( 0) + 0 on 63;
   architecture behavioral of addsub_tb at 7( 80) + 0 on 64;
-file . "alu.vhdl" "e42f8e8897925666a911a2aa3696e59a692e74ec" "20250428185518.848":
-  entity alu at 1( 0) + 0 on 415;
-  architecture rtl of alu at 14( 307) + 0 on 416;
-file . "calc_tb.vhdl" "114376bb16df82a6aebc4497e8290bbbc46780ab" "20250428190200.580":
-  entity calc_tb at 1( 0) + 0 on 423;
-  architecture tb of calc_tb at 10( 135) + 0 on 424;
+file . "alu.vhdl" "8e2749d434fbd6748dbc4659d4f3bf424c5b92c9" "20250428193117.595":
+  entity alu at 1( 0) + 0 on 437;
+  architecture rtl of alu at 14( 307) + 0 on 438;
+file . "calc_tb.vhdl" "114376bb16df82a6aebc4497e8290bbbc46780ab" "20250428203211.310":
+  entity calc_tb at 1( 0) + 0 on 509;
+  architecture tb of calc_tb at 10( 135) + 0 on 510;

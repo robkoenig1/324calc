@@ -5,7 +5,7 @@ entity counter is
 port(
     clk:      in std_logic;  -- rising-edge triggering
     reset:      in std_logic;  -- synchronous reset, active high
-    skip:     in std_logic;  -- 1: increment, 0: decrement
+    skip:     in std_logic;  -- skip count
     count:      out std_logic_vector(3 downto 0)  -- 4-bit counter output
 );
 end counter;

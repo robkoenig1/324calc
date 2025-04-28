@@ -25,23 +25,11 @@ begin
     A_lower <= A(7 downto 0);
     B_lower <= B(7 downto 0);
 
-    swapped_A <= A(7 downto 0) & A(15 downto 8);
+    swapped_A <= A(7 downto 0) & A(15 downto 8); --swap A upper and lower halves
     
-    --compare_proc: process(A_lower, B_lower)
-    --    variable temp : std_logic;
-    --begin
-    --    temp := '1'; --assume equal
-    --    for i in 0 to 7 loop
-     --       if A_lower(i) /= B_lower(i) then
-     --           temp := '0'; --not equal
-     --       end if;
-    --    end loop;
-    --    compare_result <= temp;
-    --end process;
-    compare_result <= '1' when (A_lower = B_lower) else '0';
+    compare_result <= '1' when (A_lower = B_lower) else '0'; --compare A and B
     
     carry(0) <= '0'; --no initial carry
-    
     add_gen: for i in 0 to 15 generate --add operation using ripple carry adder
         add_result(i) <= A(i) xor B(i) xor carry(i);
         carry_gen: if i < 15 generate
@@ -53,7 +41,7 @@ begin
     begin
         case op is
             when "00" => --compare
-                result <= (others => '0'); --not used for compare
+                result <= (others => '0');
                 equal <= compare_result;
                 
             when "01" => --swap
