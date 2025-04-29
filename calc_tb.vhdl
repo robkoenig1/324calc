@@ -65,13 +65,12 @@ architecture tb of calc_tb is
         return instruction;
     end function;
     
-    -- Procedure to display a register
+    --procedure to display a register (eventually)
     procedure display_register(
         signal instr: out std_logic_vector(7 downto 0);
         reg: std_logic_vector(1 downto 0)
     ) is
     begin
-        -- Create a display instruction for the specified register
         instr <= OP_CMP & reg & RT_DISPLAY & "00";
     end procedure;
 
@@ -111,8 +110,10 @@ begin
             printout_int := to_integer(signed(printout_tb));
 
             if printout_int = expected then
+                --wait_cycles(2);
                 report "PASS: Output matches expected value " & integer'image(expected);
             else
+                --wait_cycles(2);
                 report "FAIL: Expected " & integer'image(expected) & " but got " & integer'image(printout_int) severity error;
             end if;
         end procedure;
@@ -128,91 +129,108 @@ begin
         reset_tb <= '0';
         wait_cycles(2);
 
-        -- Use report statements instead of writeline for console output
-        report "Starting Calculator Test";
-        
         -- Test 1: Load immediate values into registers
         report "Test 1: Loading immediate values into registers";
         
-        -- Load R0 with immediate value 5
-        instruction_tb <= make_instruction(OP_LOAD, "00", "0101");  -- Load 5 into R0
-        wait_cycles(5);
+        instruction_tb <= "10000101"; --load 5 into R0
+        wait_cycles(2);
+        --display_register(instruction_tb, "00");
         check_output(5);
-        wait_cycles(5);
+        wait_cycles(2);
 
-        -- Load R1 with immediate value -3 (signed 4-bit value)
-        instruction_tb <= make_instruction(OP_LOAD, "01", "1101");  -- Load -3 into R1
-        wait_cycles(5);
-
-        -- Display R1
+        --instruction_tb <= make_instruction(OP_LOAD, "01", "1101");  
+        instruction_tb <= "10011101"; --load -3 into R1
+        wait_cycles(2);
         --display_register(instruction_tb, "01");
-        --wait_cycles(10);
-        -- Check output
         check_output(-3);
-        wait_cycles(5);
+        --wait_cycles(2);
         
         -- Test 2: Addition
         report "Test 2: Testing addition";
         
         -- Add R0 and R1, store in R0 (5 + (-3) = 2)
-        instruction_tb <= make_instruction(OP_ADD, R0, R1 & R0);
-        wait_cycles(1);
-        
-        -- Display R0
-        display_register(instruction_tb, R0);
-        wait_cycles(1);
-        -- Check output
+        --instruction_tb <= make_instruction(OP_ADD, R0, R1 & R0);
+        instruction_tb <= "00000100";
+        --wait_cycles(1);
+        --display_register(instruction_tb, "00");
+        wait_cycles(2);
         check_output(2);
+        wait_cycles(2);
+
+        -- Load values
+        --instruction_tb <= make_instruction(OP_LOAD, R0, "0111");  -- Load 7 into R0
+        instruction_tb <= "10000111";
+        wait_cycles(2);
+
+        
+        --instruction_tb <= make_instruction(OP_LOAD, R1, "0010");  -- Load 2 into R1
+        instruction_tb <= "10010010";
+        wait_cycles(2);
+        
+        -- Add R0 and R1, store in R2
+        --instruction_tb <= make_instruction(OP_ADD, R2, R0 & R1);
+        instruction_tb <= "00110001";
+        --wait_cycles(1);
+        --display_register(instruction_tb, "11");
+        wait_cycles(2);
+        check_output(9);  -- Should be 7 + 2 = 9
+        wait_cycles(2);
         
         -- Test 3: Swap operation
         report "Test 3: Testing swap operation";
 
         -- Load R2 with value 0x0004 (low byte=0x04)
-        instruction_tb <= make_instruction(OP_LOAD, R2, "0100");  -- Load 4 (lower byte)
-        wait_cycles(5);
-        
-        -- Load R3 with value 0x0008 (lower byte=0x08)
-        instruction_tb <= make_instruction(OP_LOAD, R3, "1000");  -- Load -8 (lower byte)
-        wait_cycles(5);
+        --instruction_tb <= make_instruction(OP_LOAD, R3, "0100");  -- Load 4 (lower byte)
+        instruction_tb <= "10110100";
+        wait_cycles(2);
+        --display_register(instruction_tb, "10");
+        --wait_cycles(1);
+        check_output(4);
+        wait_cycles(2);
 
         -- Now perform swap on R2 (assuming swap exchanges lower and upper bytes)
-        instruction_tb <= make_instruction(OP_SWAP, R0, R2 & "00");  -- Swap bytes in R2, store in R0
-        wait_cycles(1);
-        
-        -- Display R0
-        display_register(instruction_tb, R0);
-        wait_cycles(1);
-        check_output(512);
+        --instruction_tb <= make_instruction(OP_SWAP, R0, R2 & "00");  -- Swap bytes in R2, store in R0
+        instruction_tb <= "01110000";
+        wait_cycles(2);
+        --display_register(instruction_tb, "10");
+        --wait_cycles(1);
+        check_output(1024);
+        wait_cycles(2);
         -- Value would depend on how swap is implemented - can't check exact value without knowing implementation
         
         -- Test 4: Compare operation
         report "Test 4: Testing compare operation";
         
         -- Reset R0 to 5
-        instruction_tb <= make_instruction(OP_LOAD, R0, "0101");  -- Load 5 into R0
+        --instruction_tb <= make_instruction(OP_LOAD, R0, "0101");  -- Load 5 into R0
+        instruction_tb <= "10000101";
         wait_cycles(5);
         
         -- Reset R1 to 5 (same as R0)
-        instruction_tb <= make_instruction(OP_LOAD, R1, "0101");  -- Load 5 into R1
+        --instruction_tb <= make_instruction(OP_LOAD, R1, "0101");  -- Load 5 into R1
+        instruction_tb <= "10010101";
         wait_cycles(5);
         
         -- Compare R0 and R1 (they should be equal)
-        instruction_tb <= make_instruction(OP_CMP, R0, R1 & "00");  -- Compare R0 and R1
-        wait_cycles(10);
-        
+        --instruction_tb <= make_instruction(OP_CMP, R0, R1 & "00");  -- Compare R0 and R1
+        instruction_tb <= "11000100";
+        wait_cycles(2);
+        --display_register(instruction_tb, "--");
+        --wait_cycles(1);
         check_output(1);
-        wait_cycles(5);
 
         -- Reset R1 to 5 (same as R0)
-        instruction_tb <= make_instruction(OP_LOAD, R1, "0110");  -- Load 6 into R1
+        --instruction_tb <= make_instruction(OP_LOAD, R1, "0110");  -- Load 6 into R1
+        instruction_tb <= "10010110";
         wait_cycles(5);
 
         -- Compare R0 and R1 (they should be equal)
-        instruction_tb <= make_instruction(OP_CMP, R0, R1 & "00");  -- Compare R0 and R1
-        wait_cycles(5);
-
+        --instruction_tb <= make_instruction(OP_CMP, R0, R1 & "00");  -- Compare R0 and R1
+        instruction_tb <= "11000100";
+        wait_cycles(2);
+        --display_register(instruction_tb, "--");
+        --wait_cycles(1);
         check_output(0);
-        wait_cycles(5);
         -- The comparison result would typically set a flag, which we can't test directly in this testbench
         -- But we can load different values and try again
         
@@ -237,22 +255,20 @@ begin
         report "Test 5: Complex sequence";
         
         -- Load values
-        instruction_tb <= make_instruction(OP_LOAD, R0, "0111");  -- Load 7 into R0
+        --instruction_tb <= make_instruction(OP_LOAD, R0, "0111");  -- Load 7 into R0
+        instruction_tb <= "10000111";
         wait_cycles(1);
         
-        instruction_tb <= make_instruction(OP_LOAD, R1, "0010");  -- Load 2 into R1
+        --instruction_tb <= make_instruction(OP_LOAD, R1, "0010");  -- Load 2 into R1
+        instruction_tb <= "10010010";
         wait_cycles(1);
         
         -- Add R0 and R1, store in R2
-        instruction_tb <= make_instruction(OP_ADD, R2, R0 & R1);
-        wait_cycles(1);
-        
-        --instruction_tb <= make_instruction(OP_ADD, R2, R1 & "00");
+        --instruction_tb <= make_instruction(OP_ADD, R2, R0 & R1);
+        instruction_tb <= "00110001";
+        wait_cycles(2);
+        --display_register(instruction_tb, "11");
         --wait_cycles(1);
-        
-        -- Display R2
-        display_register(instruction_tb, R2);
-        wait_cycles(1);
         check_output(9);  -- Should be 7 + 2 = 9
         
         -- Complete test
