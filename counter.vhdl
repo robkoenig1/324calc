@@ -3,10 +3,10 @@ use ieee.std_logic_1164.all;
 
 entity counter is
 port(
-    clk:      in std_logic;  -- rising-edge triggering
-    reset:      in std_logic;  -- synchronous reset, active high
-    skip:     in std_logic;  -- skip count
-    count:      out std_logic_vector(3 downto 0)  -- 4-bit counter output
+    clk:   in std_logic;  -- rising-edge triggering
+    reset: in std_logic;  -- synchronous reset, active high
+    skip:  in std_logic;  -- skip count
+    count: out std_logic_vector(3 downto 0)  -- 4-bit counter output
 );
 end counter;
 
@@ -17,11 +17,11 @@ architecture structural of counter is
         WIDTH : natural 
     );
     port(    
-        I:      in std_logic_vector (WIDTH-1 downto 0);  -- for loading
-        clk:  in std_logic;  -- rising-edge triggering 
+        I:     in std_logic_vector (WIDTH-1 downto 0);  -- for loading
+        clk:   in std_logic;  -- rising-edge triggering 
         reset: in std_logic;
-        en: in std_logic;  -- 0: don't do anything; 1: reg enabled
-        O:      out std_logic_vector(WIDTH-1 downto 0)   -- output current register content
+        en:    in std_logic;  -- 0: don't do anything; 1: reg enabled
+        O:     out std_logic_vector(WIDTH-1 downto 0)   -- output current register content
     );
     end component;
 
