@@ -37,7 +37,7 @@ begin
         end generate;
     end generate;
     
-    process(op, A, B, swapped_A, add_result, compare_result)
+    process(op, A, B, add_result, swapped_A, compare_result)
     begin
         case op is
             when "00" => --compare
