@@ -19,19 +19,19 @@ architecture rtl of calc is
         WIDTH : natural
     );
     port(
-        I:   in std_logic_vector(WIDTH-1 downto 0);
-        clk: in std_logic;
+        I:     in std_logic_vector(WIDTH-1 downto 0);
+        clk:   in std_logic;
         reset: in std_logic;
-        en:  in std_logic;
-        O:   out std_logic_vector(WIDTH-1 downto 0)
+        en:    in std_logic;
+        O:     out std_logic_vector(WIDTH-1 downto 0)
     );
     end component;
 
     component counter
     port(
-        clk:  in std_logic;
+        clk:    in std_logic;
         reset:  in std_logic;
-        skip: in std_logic;
+        skip:   in std_logic;
         count:  out std_logic_vector(3 downto 0)
     );
     end component;
@@ -163,12 +163,12 @@ begin
     
     --control signals
     process(opcode)
-        variable temp: integer;
+        --variable temp: integer;
         --variable reg2_en_vec : std_logic_vector(0 downto 0);
     begin
         --reg2_en_vec := (0 => reg2_en);
-        temp := to_integer(unsigned(reg0_out));
-        report " " & integer'image(temp);
+        --temp := to_integer(unsigned(reg0_out));
+        --report " " & integer'image(temp);
 
         case opcode is
             when "00" => --add
@@ -178,7 +178,6 @@ begin
                 alu_src <= '0';
                 equ <= alu_equal;
                 print_en <= '0';
-                --ext_en <= '0';
             when "01" => --sawp
                 reg_wr <= '1';
                 reg_dst <= '0';
@@ -186,7 +185,6 @@ begin
                 alu_src <= '0';
                 equ <= alu_equal;
                 print_en <= '0';
-                --ext_en <= '0';
             when "10" => --load
                 reg_wr <= '1';
                 reg_dst <= '1';
@@ -194,7 +192,6 @@ begin
                 alu_src <= '1';
                 equ <= alu_equal;
                 print_en <= '0';
-                --ext_en <= '1';
             when "11" => --cmp and display
                 if rt = "11" then --display (eventually)
                     reg_wr <= '0';
@@ -203,7 +200,6 @@ begin
                     alu_src <= '0';
                     equ <= alu_equal;
                     print_en <= '1';
-                    --ext_en <= '0';
                 else --cmp
                     reg_wr <= '0';
                     reg_dst <= '0';
@@ -211,7 +207,6 @@ begin
                     alu_src <= '0';
                     equ <= alu_equal;
                     print_en <= '0';
-                    --ext_en <= '0';
                 end if;
             when others => --else
                 null;
@@ -267,8 +262,8 @@ begin
 
     --register file read addressing
     rf_rd_addr1 <= rs when (opcode = "00") else rd;
-    rf_rd_addr2 <= rt;  -- rt is source register 2
-    rf_wr_addr <= rd when reg_dst = '1' else rs;   -- rd is always the destination register
+    rf_rd_addr2 <= rt;
+    rf_wr_addr <= rd when reg_dst = '1' else rs;
 
     --register contents fetching
     with rf_rd_addr1 select
@@ -324,4 +319,5 @@ begin
     end process;
     
 end rtl;
+
 
