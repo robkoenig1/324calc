@@ -163,26 +163,30 @@ begin
     
     --control signals
     process(opcode)
-
+        variable temp: integer;
+        --variable reg2_en_vec : std_logic_vector(0 downto 0);
     begin
+        --reg2_en_vec := (0 => reg2_en);
+        temp := to_integer(unsigned(reg0_out));
+        report " " & integer'image(temp);
 
         case opcode is
             when "00" => --add
                 reg_wr <= '1';
-                reg_dst <= '0';
+                reg_dst <= '1';
                 alu_op <= "11";
                 alu_src <= '0';
                 equ <= alu_equal;
                 print_en <= '0';
-                ext_en <= '0';
+                --ext_en <= '0';
             when "01" => --sawp
                 reg_wr <= '1';
-                reg_dst <= '1';
+                reg_dst <= '0';
                 alu_op <= "01";
                 alu_src <= '0';
                 equ <= alu_equal;
                 print_en <= '0';
-                ext_en <= '0';
+                --ext_en <= '0';
             when "10" => --load
                 reg_wr <= '1';
                 reg_dst <= '1';
@@ -190,7 +194,7 @@ begin
                 alu_src <= '1';
                 equ <= alu_equal;
                 print_en <= '0';
-                ext_en <= '1';
+                --ext_en <= '1';
             when "11" => --cmp and display
                 if rt = "11" then --display (eventually)
                     reg_wr <= '0';
@@ -199,7 +203,7 @@ begin
                     alu_src <= '0';
                     equ <= alu_equal;
                     print_en <= '1';
-                    ext_en <= '0';
+                    --ext_en <= '0';
                 else --cmp
                     reg_wr <= '0';
                     reg_dst <= '0';
@@ -207,7 +211,7 @@ begin
                     alu_src <= '0';
                     equ <= alu_equal;
                     print_en <= '0';
-                    ext_en <= '0';
+                    --ext_en <= '0';
                 end if;
             when others => --else
                 null;
@@ -262,9 +266,9 @@ begin
     );
 
     --register file read addressing
-    rf_rd_addr1 <= rs;
-    rf_rd_addr2 <= rt;
-    rf_wr_addr <= rd when reg_dst = '1' else rs;
+    rf_rd_addr1 <= rs when (opcode = "00") else rd;
+    rf_rd_addr2 <= rt;  -- rt is source register 2
+    rf_wr_addr <= rd when reg_dst = '1' else rs;   -- rd is always the destination register
 
     --register contents fetching
     with rf_rd_addr1 select
@@ -300,18 +304,18 @@ begin
     alu_in_b <= sign_ext_imm when alu_src = '1' else rf_rd_data2;
 
     --register write back
-    reg0_in <= alu_result when rf_wr_addr = "00";
-    reg1_in <= alu_result when rf_wr_addr = "01";
-    reg2_in <= alu_result when rf_wr_addr = "10";
-    reg3_in <= alu_result when rf_wr_addr = "11";
+    reg0_in <= alu_result;
+    reg1_in <= alu_result;
+    reg2_in <= alu_result;
+    reg3_in <= alu_result;
 
     --print output for testbench
     process(clk)
     begin
         if rising_edge(clk) then
-            if print_en = '1' then
-                printout <= rf_rd_data1;
-            elsif alu_op = "00" then
+            --if print_en = '1' then
+            --    printout <= rf_rd_data1;
+            if alu_op = "00" then
                 printout <= (0 => alu_equal, others => '0');
             else
                 printout <= alu_result;
@@ -320,3 +324,4 @@ begin
     end process;
     
 end rtl;
+
