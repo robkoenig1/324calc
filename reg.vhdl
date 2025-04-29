@@ -4,14 +4,14 @@ use IEEE.numeric_std.all;
 
 entity reg is
 generic (
-    WIDTH : natural := 16  -- Default width is 8 bits, can be overridden at instantiation.
+    WIDTH : natural
   );
 port(	
-	I:	in std_logic_vector (WIDTH-1 downto 0); -- for loading
- 	clk:		in std_logic; -- rising-edge triggering 
+	I:	   in std_logic_vector (WIDTH-1 downto 0); --for loading
+ 	clk:   in std_logic; --rising-edge triggering 
     reset: in std_logic;
-	en:		in std_logic; -- 0: don't do anything; 1: reg is enabled
-	O:	out std_logic_vector(WIDTH-1 downto 0) -- output the current register content. 
+	en:	   in std_logic; -- 0: don't do anything; 1: reg is enabled
+	O:	   out std_logic_vector(WIDTH-1 downto 0) -- output the current register content. 
 );
 end reg;
 
@@ -34,3 +34,4 @@ begin
 
     O <= reg_content; -- output the current register content
 end behavioral;
+
